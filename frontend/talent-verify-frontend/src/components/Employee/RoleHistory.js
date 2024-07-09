@@ -23,10 +23,10 @@ function RoleHistory() {
       setLoading(false);
       return;
     }
-
+  
     try {
-      const response = await getRoleHistory(id);
-      setRoleHistory(response.data);
+      const data = await getRoleHistory(id);
+      setRoleHistory(data);
     } catch (error) {
       console.error('Error fetching role history:', error);
       setError('Failed to fetch role history');

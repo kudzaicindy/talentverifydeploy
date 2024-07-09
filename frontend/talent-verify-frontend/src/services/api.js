@@ -51,15 +51,22 @@ export const searchEmployees = (query) => api.get(`employees/search/?q=${query}`
 
 export const getCompanyDepartments = (id) => api.get(`/companies/${id}/departments`);
 
+
+
+export const getRoleHistory = async (employeeId) => {
+  const response = await axios.get(`${API_BASE_URL}/employees/${employeeId}/roles/`);
+  return response.data;
+};
+
 export const deleteRole = async (employeeId, roleId) => {
-  return await axios.delete(`/api/employees/${employeeId}/roles/${roleId}/`);
+  const response = await axios.delete(`${API_BASE_URL}/roles/${roleId}/`);
+  return response.data;
 };
 
 export const addRole = async (employeeId, roleData) => {
-  return await axios.post(`/api/employees/${employeeId}/roles/`, roleData);
+  const response = await axios.post(`${API_BASE_URL}/employees/${employeeId}/roles/`, roleData);
+  return response.data;
 };
-
-export const getRoleHistory = (id) => api.get(`/employees/${id}/role-history/`);
 
 export const getCompanies = () => api.get('companies/');
 
