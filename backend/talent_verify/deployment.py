@@ -33,8 +33,19 @@ STORAGES={
         "BACKEND":"whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-CONNECTION =os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
-CONNECTION_STR={pair.split('=')[0]:pair.split('=')[1] for pair in CONNECTION.split(' ')}
+CONNECTION =os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING','')
+print(f"DEBUG: CONNECTION = {CONNECTION}")
+CONNECTION_STR = {}
+if CONNECTION:
+    pairs = CONNECTION.split()
+    for pair in pairs:
+        if '=' in pair:
+            key, value = pair.split('=', 1)
+            CONNECTION_STR[key.strip()] = value.strip()
+        else:
+            print(f"Warning: Skipping malformed pair: {pair}")
+
+print(f"DEBUG: CONNECTION_STR = {CONNECTION_STR}")
 
 DATABASES = {
     'default': {
