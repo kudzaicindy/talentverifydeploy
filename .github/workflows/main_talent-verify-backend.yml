@@ -9,44 +9,44 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v4
-
+    
     - name: Set up Python version
       uses: actions/setup-python@v1
       with:
         python-version: '3.11'
-
+    
     - name: Create and start virtual environment
       run: |
         cd backend
         python -m venv myenv
         source myenv/bin/activate
-
+    
     - name: Install dependencies
       run: |
         cd backend
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
+    
     - name: Check Python version
       run: python --version
-
+    
     - name: Check installed packages
       run: pip list
-
+    
     - name: Debug Environment Variables
       run: |
         echo "DJANGO_SETTINGS_MODULE is set to: $DJANGO_SETTINGS_MODULE"
         echo "WEBSITE_HOSTNAME is set to: $WEBSITE_HOSTNAME"
         echo "AZURE_POSTGRESQL_CONNECTIONSTRING is: ${AZURE_POSTGRESQL_CONNECTIONSTRING:0:10}..."
-
+    
     - name: Check directory structure
       run: |
         pwd
         ls -R
-
+    
     - name: Collect static files
       run: |
         cd backend
@@ -58,19 +58,17 @@ jobs:
         WEBSITE_HOSTNAME: talent-verify-backend.azurewebsites.net
         MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
         AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
-
+    
     - name: Zip artifact for deployment
       run: |
-      cd backend
-      zip release.zip ./* -r
-
+        cd backend
+        zip release.zip ./* -r
+    
     - name: Upload artifact for deployment jobs
       uses: actions/upload-artifact@v3
       with:
         name: python-app
-        path: |
-        cd backend/release.zip
-        !myenv/
+        path: backend/release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -78,14 +76,12 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    
     steps:
     - name: Download artifact from build job
       uses: actions/download-artifact@v3
       with:
         name: python-app
-
+    
     - name: Unzip artifact for deployment
       run: unzip release.zip
-
-    
