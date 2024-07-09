@@ -42,10 +42,10 @@ if CONNECTION:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': conn_parts.get('dbname', 'talentdb'),
+            'NAME': conn_parts.get('dbname', 'talentverifydb'),
             'HOST': conn_parts.get('host', 'talent-verify-backend-server.postgres.database.azure.com'),
             'USER': conn_parts.get('user', 'rgntmemzbi@talent-verify-backend-server'),
-            'PASSWORD': conn_parts.get('password', ''),
+            'PASSWORD': conn_parts.get('password', 'kudzai30'),
             'PORT': conn_parts.get('port', '5432'),
             'OPTIONS': {
                 'sslmode': 'require',
