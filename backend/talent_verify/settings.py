@@ -62,11 +62,14 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'talentverify'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'kudzai30'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'NAME': 'talentverifydb',  # The name of your database on Azure
+        'HOST': 'talent-verify-backend-server.postgres.database.azure.com',
+        'USER': 'rgntmemzbi@talent-verify-backend-server',
+        'PASSWORD': 'kudzai30',  # Replace with the actual password
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 AUTH_PASSWORD_VALIDATORS = [
