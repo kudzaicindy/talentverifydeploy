@@ -288,7 +288,7 @@ def add_employee_history(request, employee_id):
         form = EmployeeHistoryForm()
     return render(request, 'add_employee_history.html', {'form': form, 'employee': employee})
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def employee_role_history(request, id):
     try:
@@ -296,10 +296,16 @@ def employee_role_history(request, id):
     except Employee.DoesNotExist:
         raise NotFound('Employee not found')
     
-    roles = Role.objects.filter(employee=employee).order_by('-start_date')
-    serializer = RoleSerializer(roles, many=True)
-    return Response(serializer.data)
-
+    if request.method == 'GET':
+        roles = Role.objects.filter(employee=employee).order_by('-start_date')
+        serializer = RoleSerializer(roles, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = RoleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(employee=employee)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class EmployeeHistoryViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
@@ -310,9 +316,20 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
     permission_classes = [AllowAny]
 
-    def create(self, request, employee_id=None):
+    class RoleViewSet(viewsets.ModelViewSet):
+        queryset = Role.objects.all()
+        serializer_class = RoleSerializer
+        permission_classes = [AllowAny]
+
+    @action(detail=False, methods=['GET', 'POST'], url_path='employee/(?P<employee_id>[^/.]+)')
+    def employee_roles(self, request, employee_id=None):
         employee = get_object_or_404(Employee, id=employee_id)
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(employee=employee)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'GET':
+            roles = Role.objects.filter(employee=employee).order_by('-start_date')
+            serializer = self.get_serializer(roles, many=True)
+            return Response(serializer.data)
+        elif request.method == 'POST':
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(employee=employee)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
