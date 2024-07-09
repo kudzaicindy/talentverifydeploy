@@ -27,7 +27,7 @@ STORAGES={
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles":{
-        "BACKEND":"whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND":"whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 CONNECTION =os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']

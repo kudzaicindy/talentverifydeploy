@@ -34,7 +34,8 @@ jobs:
         run: |
           cd backend
           python manage.py collectstatic --noinput
-
+        env:
+          DJANGO_SETTINGS_MODULE: talent_verify.deployment
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
