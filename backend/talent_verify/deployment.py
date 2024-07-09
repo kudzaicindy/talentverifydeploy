@@ -1,4 +1,4 @@
-import os 
+import os
 from .settings import *
 from .settings import BASE_DIR
 
@@ -7,8 +7,6 @@ CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS]
 
 DEBUG = False
 SECRET_KEY = os.environ.get('MY_SECRET_KEY', 'a-default-secret-key')
-DEBUG=False
-SECRET_KEY=os.environ['MY_SECRET_KEY']
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -21,20 +19,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-#CORS_ALLOWED_ORIGINS=[
 
-#]
-
-STORAGES={
-    "default":{
+STORAGES = {
+    "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
-    "staticfiles":{
-        "BACKEND":"whitenoise.storage.CompressedManifestStaticFilesStorage",
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-CONNECTION =os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING','')
+
+CONNECTION = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING', '')
 print(f"DEBUG: CONNECTION = {CONNECTION}")
+
 CONNECTION_STR = {}
 if CONNECTION:
     pairs = CONNECTION.split()
@@ -50,14 +47,16 @@ print(f"DEBUG: CONNECTION_STR = {CONNECTION_STR}")
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': CONNECTION_STR['dbname'],
-        'USER': CONNECTION_STR['user'],
-        'PASSWORD':CONNECTION_STR['password'],
-        'HOST': CONNECTION_STR['host'],
-        
+        'NAME': CONNECTION_STR.get('dbname', 'talentdb'),
+        'USER': CONNECTION_STR.get('user', 'rgntmemzbi@talent-verify-backend-server'),
+        'PASSWORD': CONNECTION_STR.get('password', ''),
+        'HOST': CONNECTION_STR.get('host', 'talent-verify-backend-server.postgres.database.azure.com'),
+        'PORT': CONNECTION_STR.get('port', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-
-
 }
+
 STATIC_URL = '/static/'
-STATIC_ROOT= BASE_DIR/'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
