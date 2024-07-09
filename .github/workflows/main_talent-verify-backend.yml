@@ -33,7 +33,7 @@ jobs:
           cd backend
           python manage.py collectstatic --noinput
         env:
-          DJANGO_SETTINGS_MODULE: deployment
+          DJANGO_SETTINGS_MODULE: talent_verify.deployment
           WEBSITE_HOSTNAME: talent-verify-backend.azurewebsites.net
           MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
           AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
