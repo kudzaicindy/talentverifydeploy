@@ -1,1 +1,1 @@
-web: cd backend && gunicorn talent_verify.wsgi
+web:  gunicorn talent_verify.wsgi

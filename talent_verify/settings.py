@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'backend.api',  # Update this line
+    'api',  # Update this line
 ]
 
 MIDDLEWARE = [
