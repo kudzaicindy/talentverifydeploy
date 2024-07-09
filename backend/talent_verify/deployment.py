@@ -29,34 +29,39 @@ STORAGES = {
     },
 }
 
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
 CONNECTION = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING', '')
 print(f"DEBUG: CONNECTION = {CONNECTION}")
 
-CONNECTION_STR = {}
 if CONNECTION:
-    pairs = CONNECTION.split()
-    for pair in pairs:
-        if '=' in pair:
-            key, value = pair.split('=', 1)
-            CONNECTION_STR[key.strip()] = value.strip()
-        else:
-            print(f"Warning: Skipping malformed pair: {pair}")
-
-print(f"DEBUG: CONNECTION_STR = {CONNECTION_STR}")
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': CONNECTION_STR.get('dbname', 'talentdb'),
-        'USER': CONNECTION_STR.get('user', 'rgntmemzbi@talent-verify-backend-server'),
-        'PASSWORD': CONNECTION_STR.get('password', ''),
-        'HOST': CONNECTION_STR.get('host', 'talent-verify-backend-server.postgres.database.azure.com'),
-        'PORT': CONNECTION_STR.get('port', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+    # Parse the connection string
+    conn_parts = dict(x.split('=') for x in CONNECTION.split(' ') if '=' in x)
+    
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': conn_parts.get('dbname', 'talentdb'),
+            'HOST': conn_parts.get('host', 'talent-verify-backend-server.postgres.database.azure.com'),
+            'USER': conn_parts.get('user', 'rgntmemzbi@talent-verify-backend-server'),
+            'PASSWORD': conn_parts.get('password', ''),
+            'PORT': conn_parts.get('port', '5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+        }
     }
-}
+else:
+    # Fallback to default SQLite database
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+print(f"DEBUG: DATABASES = {DATABASES}")
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
