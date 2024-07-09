@@ -20,34 +20,34 @@ jobs:
 
       - name: Create and start virtual environment
         run: |
-          cd backend
           python -m venv venv
           source venv/bin/activate
 
       - name: Install dependencies
         run: |
-          cd backend
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
 
       - name: Collect static files
         run: |
           cd backend
           python manage.py collectstatic --noinput
         env:
-          DJANGO_SETTINGS_MODULE: talent_verify.deployment
+          DJANGO_SETTINGS_MODULE: deployment
+          WEBSITE_HOSTNAME: talent-verify-backend.azurewebsites.net
+          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
+
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
-        run: |
-          cd backend
-          zip release.zip ./* -r
+        run: zip release.zip ./backend/* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
           name: python-app
-          path: backend/release.zip
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest

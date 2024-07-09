@@ -2,8 +2,11 @@ import os
 from .settings import *
 from .settings import BASE_DIR
 
-ALLOWED_HOSTS=[os.environ['WEBSITE_HOSTNAME']]
-CSRF_TRUSTED_ORIGINS=['https://'+os.environ['WEBSITE_HOSTNAME']]
+ALLOWED_HOSTS = os.environ.get('WEBSITE_HOSTNAME', 'localhost').split(',')
+CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS]
+
+DEBUG = False
+SECRET_KEY = os.environ.get('MY_SECRET_KEY', 'a-default-secret-key')
 DEBUG=False
 SECRET_KEY=os.environ['MY_SECRET_KEY']
 
