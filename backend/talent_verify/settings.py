@@ -2,16 +2,14 @@ import os
 from pathlib import Path
 from cryptography.fernet import Fernet
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'bb5f91b8ae0d631cf31331fe1009aca16b3c79353ee4f5052fa4d724365f8356')
 
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','bb5f91b8ae0d631cf31331fe1009aca16b3c79353ee4f5052fa4d724365f8356')#my generated security key
-
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -28,6 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this for static files on Heroku
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -37,12 +36,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'talent_verify.urls'
+ROOT_URLCONF = 'backend.talent_verify.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'backend', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -55,20 +54,20 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'talent_verify.wsgi.application'
+WSGI_APPLICATION = 'backend.talent_verify.wsgi.application'
 
-import os
-
+# Database configuration for Heroku
+import dj_database_url
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'talentverify'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'kudzai30'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    }
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
+
+# Use SQLite for local development if DATABASE_URL is not set
+if 'DATABASE_URL' not in os.environ:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
@@ -88,6 +87,8 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -101,6 +102,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ]
 }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -110,34 +112,26 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django.request': {
+        'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'ERROR'),
         },
     },
 }
-CSRF_COOKIE_SECURE = False  # Set to True in production
-SESSION_COOKIE_SECURE = False 
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development, restrict in production
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only for development
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://your-frontend-app-name.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
-CSRF_USE_SESSIONS = False
 
-CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://your-frontend-app-name.onrender.com']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
-# For development (change these in production)
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
-CSRF_USE_SESSIONS = False
-#CSRF_COOKIE_SAMESITE = 'Lax'
-#SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
-ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY','PuK8qBO548l9PZB0-gUMQ-nEJhciBIUI96D_0C30HGs=') # Generate this securely
+
+ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY', 'PuK8qBO548l9PZB0-gUMQ-nEJhciBIUI96D_0C30HGs=')

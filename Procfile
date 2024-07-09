@@ -1,1 +1,1 @@
-web: gunicorn talent_verify.wsgi
+web: gunicorn backend.talent_verify.wsgi
