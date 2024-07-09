@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from cryptography.fernet import Fernet
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -9,7 +10,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'bb5f91b8ae0d631cf31331fe1009ac
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com']
+ALLOWED_HOSTS = ['talent-verify-web-5d602366e896.herokuapp.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,12 +22,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'backend.api.apps.ApiConfig',
+    'backend.api',  # Update this line
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this for static files on Heroku
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,7 +58,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.talent_verify.wsgi.application'
 
 # Database configuration for Heroku
-import dj_database_url
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
