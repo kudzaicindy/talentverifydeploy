@@ -11,43 +11,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.11'
+    - name: Set up Python version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.11'
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
+    - name: Create and start virtual environment
+      run: |
+        python -m venv venv
+        source venv/bin/activate
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt
 
-      - name: Collect static files
-        run: |
-          cd backend
-          python manage.py collectstatic --noinput
-        env:
-          DJANGO_SETTINGS_MODULE: talent_verify.deployment
-          WEBSITE_HOSTNAME: talent-verify-backend.azurewebsites.net
-          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
-          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
+    - name: Debug Environment Variables
+      run: |
+        echo "DJANGO_SETTINGS_MODULE is set to: $DJANGO_SETTINGS_MODULE"
+        echo "WEBSITE_HOSTNAME is set to: $WEBSITE_HOSTNAME"
+        echo "AZURE_POSTGRESQL_CONNECTIONSTRING is: ${AZURE_POSTGRESQL_CONNECTIONSTRING:0:10}..."
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+    - name: Collect static files
+      run: |
+        cd backend
+        python manage.py collectstatic --noinput
+      env:
+        DJANGO_SETTINGS_MODULE: talent_verify.deployment
+        WEBSITE_HOSTNAME: talent-verify-backend.azurewebsites.net
+        MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+        AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./backend/* -r
+    - name: Zip artifact for deployment
+      run: zip release.zip ./backend/* -r
 
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
-        with:
-          name: python-app
-          path: release.zip
+    - name: Upload artifact for deployment jobs
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-app
+        path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,18 +61,18 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: python-app
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: python-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+    - name: Unzip artifact for deployment
+      run: unzip release.zip
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: 'talent-verify-backend'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9FE858CC47934ED29101D7F8D2BE83AF }}
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
+      id: deploy-to-webapp
+      with:
+        app-name: 'talent-verify-backend'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9FE858CC47934ED29101D7F8D2BE83AF }}
