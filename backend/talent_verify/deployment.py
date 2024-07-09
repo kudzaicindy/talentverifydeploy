@@ -32,36 +32,18 @@ STORAGES = {
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-CONNECTION = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING', '')
-print(f"DEBUG: CONNECTION = {CONNECTION}")
+CONNECTION = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
+CONNECTION_STR = {pair.split('=')[0]:pair.split('=')[1] for pair in CONNECTION.split(' ')}
 
-if CONNECTION:
-    # Parse the connection string
-    conn_parts = dict(x.split('=') for x in CONNECTION.split(' ') if '=' in x)
-    
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': conn_parts.get('dbname', 'talentverifydb'),
-            'HOST': conn_parts.get('host', 'talent-verify-backend-server.postgres.database.azure.com'),
-            'USER': conn_parts.get('user', 'rgntmemzbi@talent-verify-backend-server'),
-            'PASSWORD': conn_parts.get('password', 'kudzai30'),
-            'PORT': conn_parts.get('port', '5432'),
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": CONNECTION_STR['dbname'],
+        "HOST": CONNECTION_STR['host'],
+        "USER": CONNECTION_STR['user'],
+        "PASSWORD": CONNECTION_STR['password'],
     }
-else:
-    # Fallback to default SQLite database
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-
-print(f"DEBUG: DATABASES = {DATABASES}")
+}
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'

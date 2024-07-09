@@ -61,17 +61,11 @@ import os
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'talentverifydb',  # The name of your database on Azure
-        'HOST': 'talent-verify-backend-server.postgres.database.azure.com',
-        'USER': 'rgntmemzbi@talent-verify-backend-server',
-        'PASSWORD': 'kudzai30',  # Replace with the actual password
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
