@@ -16,7 +16,7 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', (admin.site.urls)),
-    path('api/', include('api.urls')),
+    path('api/', include('backend.api.urls')),
     path('admin/login/', LoginView.as_view(template_name='admin/login.html'), name='admin_login'),
     path('admin/logout/', LogoutView.as_view(next_page='admin_login'), name='admin_logout'),
     path('', RedirectView.as_view(url='/api/', permanent=False)),
